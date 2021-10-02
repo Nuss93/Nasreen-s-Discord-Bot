@@ -1,5 +1,8 @@
+from keep_alive import keep_alive
+
 # imports discord.py library
 import discord
+from discord.utils import find
 # gets the TOKEN from .env file
 import os
 import random
@@ -16,7 +19,8 @@ lyrics = [
     "Oh, shit... \n\nShould I be joking at a time like this?",
     "If you start to smell burning toast, you're having a stroke or overcooking your toast.",
     "I've been where I always am when you're not wearing me on your hand: in a frightening, liminal space between states of being! Not quite dead, not quite alive! It's similar to a constant state of sleep paralysis.",
-    "Who needs a coffee? 'Cause I'm doing a run. I'm writing down the orders now for everyone. The coffee is free, just like me I'm an unpaid intern", "Wa-da-da-wap-wa-da",
+    "Who needs a coffee? 'Cause I'm doing a run. I'm writing down the orders now for everyone. The coffee is free, just like me I'm an unpaid intern",
+    "Wa-da-da-wap-wa-da",
     "CEO, entrepreneur. \nBorn in 1964. \nJeffrey, Jeffrey Bezos~",
     "Come on, Jeffrey, you can do it. \nPave the way, put your back into it.",
     "Zuckerberg and Gates and Buffett. \nAmateurs can fuckin' suck it. \nFuck their wives, drink their blood. \n\nCome on, Jeff, get 'em",
@@ -33,7 +37,8 @@ lyrics = [
     "How we feelin' out there tonight? \nHahaha, yeah... \n\nI am not feeling good~",
     "Are you feeling what I'm feeling? \nI haven't had a shower in the last nine days.",
     "Staring at the ceiling and waiting for this feeling to go away. \nBut it won't go away.",
-    "Well, I feel like shit (Oh, shit) \nFeeling like a saggy, massive sack of shit (Oh, shit) \nBig ol' motherfucking duffel bag of shit (Oh, shit)", "All day, all shit~",
+    "Well, I feel like shit (Oh, shit) \nFeeling like a saggy, massive sack of shit (Oh, shit) \nBig ol' motherfucking duffel bag of shit (Oh, shit)",
+    "All day, all shit~",
     "So, um... Uh, my current mental health is is rapidly approaching, um... an ATL ... which is, um... That's an all-time low. Not... Not Atlanta. And, you know, I feel okay when I'm asleep. Like, when I'm asleep I feel alright.",
     "A few things start to happen, \nmy vision starts to flatten. \nMy heart, it gets to tappin' \n\nAnd I think I'm gonna die!",
     "Yeah, so, um, yeah. \nNot, not doing great.",
@@ -42,7 +47,8 @@ lyrics = [
     "'Cause a random guy just kindly sent you photos of his cock. \nThey are grainy and off-putting; he just sent you more. \nDon't act surprised—you know you like it, you whore.",
     "Could I interest you in everything all of the time? \nA little bit of everything all of the time.",
     "Apathy's a tragedy, and boredom is a crime. \nAnything and everything all of the time~",
-    "We set our sights and spent our nights waiting for you! \nYou, insatiable you", "Jeffrey Bezos \n\nCongratulations!",
+    "We set our sights and spent our nights waiting for you! \nYou, insatiable you",
+    "Jeffrey Bezos \n\nCongratulations!",
     "Does anybody want to joke when no one's laughing in the background?",
     "So this is how it ends I promise to never go outside again.",
     "I'm slowly losing power has it only been an hour? \n\nNo, that can't be right.",
@@ -59,24 +65,29 @@ if "responding" not in db.keys():
     db["responding"] = True
 
 
-def update_encouragements(encouraging_message):
-    if "encouragements" in db.keys():
-        encouragements = db["encouragements"].value
-        encouragements.append(encouraging_message)
-        db["encouragements"] = encouragements
-    else:
-        db["encouragements"] = [encouraging_message]
+@client.event
+async def on_guild_join(guild):
+    general = find(lambda x: x.name == 'general', guild.text_channels)
 
+    embedJoin = discord.Embed(
+        title="OwO~! What's this? I have landed in a random server UwU",
+        description=
+        "I was created by my mother, Nuss93 to annoy people she knows by sending random Bo Burnham lyrics at random times. The more active you are in a server, the higher the probability of you getting a free lyric from me! \nOh boiii, isn't that fun?",
+        color=0x4f98d5,
+        url="https://www.youtube.com/watch?v=-VAvUgzey3I")
+    embedJoin.add_field(
+      name="How to use me?",
+      value="It's okay, you can use me as you please, no need to feel guilty about it :) \n\n`$lyrics` : Get random lyrics instantly \n\n`$youthere` : Checks if I am still alive... Thanks for checking up on me. Sometimes, I feel like being all alone makes me questions why am I still alive. And then I go into a depressive spiral thinking about ways I can out myself and end this miserable life. \n\n`$how` : I get it, we are forgetful human beings, you might need some help with my commands."
+    )
+    embedJoin.set_footer(text="Anyways! Enjoy the amazing lyrics I will be sharing :D Hope you enjoy!")
+    if general and general.permissions_for(guild.me).send_messages:
+        await general.send(embed=embedJoin)
 
-def delete_encouragment(index):
-    encouragements = db["encouragements"].value
-    if len(encouragements) > index:
-        del encouragements[index]
-    db["encouragements"] = encouragements
 
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
+
 
 @client.event
 async def on_message(message):
@@ -84,7 +95,10 @@ async def on_message(message):
         return
 
     msg = message.content
-    random_send = random.choice([False, True, False, True, False, False, False])
+    # random_send = random.choice(
+    #     [True])
+    random_send = random.choice(
+        [False, True, False, True, False, False, False, False, False, False, False, False, False, False])
 
     if db["responding"]:
         options = lyrics
@@ -94,8 +108,27 @@ async def on_message(message):
     if msg.startswith('$lyrics'):
         await message.channel.send(random.choice(options))
 
+    if msg.startswith('$youthere'):
+        await message.channel.send(
+            "Hi, yes! I am still alive and well thank you very much ;)")
+        await message.channel.send("I've been where I always am when I'm not sending messages to this server : in a frightening, liminal space between states of being! Not quite dead, not quite alive! It's similar to a constant state of sleep paralysis.")
+        await message.channel.send("But anyways, thanks for checking up on me. Sometimes, I feel like being all alone makes me questions why am I still alive. And then I go into a depressive spiral thinking about ways I can out myself and end this miserable life.")
+        await message.channel.send("Beep boop, have a nice day~")
+    
+    if msg.startswith('$how'):
+        await message.channel.send(
+            "OwO~! Someone asked HOW to use me?")
+        await message.channel.send("`$lyrics` : Get random lyrics instantly \n\n`$youthere` : Checks if I am still alive... Thanks for checking up on me. Sometimes, I feel like being all alone makes me questions why am I still alive. And then I go into a depressive spiral thinking about ways I can out myself and end this miserable life. \n\n`$how` : Prompts this exact same message if you need to be reminded of how to summon me. I know you are obsessed with me, but let's keep it on the DL okay ;)")
+        await message.channel.send("Beep boop, have a nice day~")
+
+    print(random_send)
     if random_send:
-        embedVar = discord.Embed(title="Hello there! You have been graced with Bo Burnham's wonderful presence", description="Here's a random Bo Burnham lyric from Inside!", color=0x4f98d5, url="https://www.youtube.com/watch?v=-VAvUgzey3I")
+        embedVar = discord.Embed(
+            title=
+            "Hello there! You have been graced with Bo Burnham's wonderful presence",
+            description="Here's a random Bo Burnham lyric from Inside!",
+            color=0x4f98d5,
+            url="https://www.youtube.com/watch?v=-VAvUgzey3I")
         embedVar.add_field(name=random.choice(options), value="Hope you enjoy~")
         await message.channel.send(embed=embedVar)
 
@@ -110,4 +143,6 @@ async def on_message(message):
             db["responding"] = False
             await message.channel.send("Responding is off.")
 
+
+keep_alive()
 client.run(os.getenv('TOKEN'))
